@@ -259,63 +259,68 @@ export default function Home() {
 	}
 
 	return (
-		<main className="flex min-h-screen max-w-[1248px] mx-auto flex-row items-center justify-between">
+		<main className="flex min-h-screen flex-col">
 			{showConfetti && width && height && <Confetti width={width} height={height} />}
-			<div className="z-10 w-[30%] h-screen flex flex-col items-center gap-2 font-mono text-sm lg:flex">
-				<div className="p-4 gap-2 overflow-y-scroll h-full w-full flex flex-col">
-					<div className="flex-row rounded-xl flex gap-2">
-						<div>
-							<p className="text-lg  my-auto mr-auto ml-2">Winners</p>
-							<p className="my-auto mr-auto ml-2 text-xs">
-								{students.filter((student) => student.selected).length}/{students.length}
+			<div className="h-10 max-w-[1248px] w-full mx-auto p-6">
+				<h1 className="text-xl">Y7 Raffle</h1>
+			</div>
+			<div className="flex flex-row max-w-[1248px] w-full h-[calc(100vh-48px)] mx-auto">
+				<div className="z-10 w-[30%] flex flex-col items-center gap-2 font-mono text-sm lg:flex">
+					<div className="p-4 gap-2 overflow-y-scroll h-full w-full flex flex-col">
+						<div className="flex-row rounded-xl flex gap-2">
+							<div>
+								<p className="text-lg  my-auto mr-auto ml-2">Winners</p>
+								<p className="my-auto mr-auto ml-2 text-xs">
+									{students.filter((student) => student.selected).length}/{students.length}
+								</p>
+							</div>
+							{!!students.filter((student) => student.selected).length && (
+								<>
+									<Button onPress={createCommaSeparatedWinnerUidString} size="sm">
+										Copy All
+									</Button>
+									<Button onPress={removeAllWinners} size="sm">
+										Remove All
+									</Button>
+								</>
+							)}
+						</div>
+						{!students.filter((student) => student.selected).length && <p className="pl-2">No Winners Yet</p>}
+						{students
+							.filter((student) => student.selected)
+							.map((student) => (
+								<div key={student.uid} className="bg-gradient-to-b flex flex-col gap-2 text-sm w-full from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:rounded-xl lg:border shadow-lg lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
+									<span>{student.name}</span>
+									<span>
+										{student.reg} • ID: {student.uid}
+									</span>
+									<Button onPress={() => removeWinner(student.uid)}>Remove</Button>
+								</div>
+							))}
+					</div>
+					<div onSubmit={(e) => e.preventDefault()} className="flex p-2 gap-2 w-full">
+						<Input placeholder="Enter ID to Add" value={addWinnerInput} onChange={(e) => setAddWinnerInput(e.target.value)} className="h-full"></Input>
+						<Button isDisabled={students.filter((s) => s.selected).length == students.length} type="submit" onPress={addWinner} className="h-full">
+							Add →
+						</Button>
+					</div>
+				</div>
+				<div className="z-10 w-[70%] flex flex-col gap-4 items-center justify-between font-mono text-sm lg:flex">
+					{!showModal && latestName && !!students.filter((s) => s.selected).length && <Spinner className="p-12 z-[500000] h-full flex flex-col gap-4 w-full" size="lg" />}
+					{showModal && (
+						<div className="p-12 z-[500000] h-full flex flex-col gap-4 w-full">
+							<p className="text-[20px]">NEW WINNER</p>
+							<p className="text-[40px] font-sans">{students.filter((s) => s.uid === latestName)[0].name}</p>
+							<p className="text-[20px] font-sans">
+								{students.filter((s) => s.uid === latestName)[0].reg} • {students.filter((s) => s.uid === latestName)[0].uid}
 							</p>
 						</div>
-						{!!students.filter((student) => student.selected).length && (
-							<>
-								<Button onPress={createCommaSeparatedWinnerUidString} size="sm">
-									Copy All
-								</Button>
-								<Button onPress={removeAllWinners} size="sm">
-									Remove All
-								</Button>
-							</>
-						)}
+					)}
+					<div className="w-full mt-auto bottom-0 p-2 min-h-[72px] !h-[72px]">
+						<Button onPress={drawNewName} isDisabled={students.filter((s) => s.selected).length == students.length} isLoading={isLoading} className="w-full h-full mt-auto bg-gradient-to-r from-green-300 via-blue-500 to-purple-600">
+							Draw New Name
+						</Button>
 					</div>
-					{!students.filter((student) => student.selected).length && <p className="pl-2">No Winners Yet</p>}
-					{students
-						.filter((student) => student.selected)
-						.map((student) => (
-							<div key={student.uid} className="bg-gradient-to-b flex flex-col gap-2 text-sm w-full from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:rounded-xl lg:border shadow-lg lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-								<span>{student.name}</span>
-								<span>
-									{student.reg} • ID: {student.uid}
-								</span>
-								<Button onPress={() => removeWinner(student.uid)}>Remove</Button>
-							</div>
-						))}
-				</div>
-				<div onSubmit={(e) => e.preventDefault()} className="flex p-2 gap-2 w-full">
-					<Input placeholder="Enter ID to Add" value={addWinnerInput} onChange={(e) => setAddWinnerInput(e.target.value)} className="h-full"></Input>
-					<Button isDisabled={students.filter((s) => s.selected).length == students.length} type="submit" onPress={addWinner} className="h-full">
-						Add →
-					</Button>
-				</div>
-			</div>
-			<div className="z-10 w-[70%] flex flex-col gap-4 h-screen p-4 items-center justify-between font-mono text-sm lg:flex">
-				{!showModal && !!students.filter((s) => s.selected).length && <Spinner className="p-12 z-[500000] h-full flex flex-col gap-4 w-full" size="lg" />}
-				{showModal && (
-					<div className="p-12 z-[500000] h-full flex flex-col gap-4 w-full">
-						<p className="text-[20px]">NEW WINNER</p>
-						<p className="text-[40px] font-sans">{students.filter((s) => s.uid === latestName)[0].name}</p>
-						<p className="text-[20px] font-sans">
-							{students.filter((s) => s.uid === latestName)[0].reg} • {students.filter((s) => s.uid === latestName)[0].uid}
-						</p>
-					</div>
-				)}
-				<div className="w-full mt-auto bottom-0 p-2 h-[72px]">
-					<Button onPress={drawNewName} isDisabled={students.filter((s) => s.selected).length == students.length} isLoading={isLoading} className="w-full h-full mt-auto bg-gradient-to-r from-green-300 via-blue-500 to-purple-600">
-						Draw New Name
-					</Button>
 				</div>
 			</div>
 		</main>
