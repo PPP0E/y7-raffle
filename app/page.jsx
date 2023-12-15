@@ -1,12 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, ButtonGroup } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
 import Confetti from "react-confetti";
 import useWindowDimensions from "@/lib/window-size";
 import { Spinner } from "@nextui-org/react";
+import { Select, SelectSection, SelectItem } from "@nextui-org/react";
 
 export default function Home() {
 	const studentsList = [
@@ -171,7 +172,11 @@ export default function Home() {
 	const { width, height } = useWindowDimensions();
 	const [latestName, setLatestName] = useState("");
 	const [showModal, setShowModal] = useState(false);
-	const [showSpinner, setShowSpinner] = useState(false);
+	const [disabled, setDisabled] = useState(false);
+	const [waitTime, setWaitTime] = useState(7000);
+	const [confettiTime, setConfettiTime] = useState(3000);
+	const [x, setX] = useState(0);
+	const [y, setY] = useState(0);
 
 	function removeWinner(uid) {
 		setShowConfetti(false);
@@ -237,9 +242,10 @@ export default function Home() {
 	}
 
 	async function drawNewName() {
+		setDisabled(true);
 		setIsLoading(true);
 		setShowModal(false);
-		await new Promise((resolve) => setTimeout(resolve, 3000)); //3000
+		await new Promise((resolve) => setTimeout(resolve, waitTime)); //3000
 		const winner = students.filter((student) => !student.selected)[Math.floor(Math.random() * students.filter((student) => !student.selected).length)];
 		setStudents(
 			students.map((student) => {
@@ -254,7 +260,8 @@ export default function Home() {
 		setShowConfetti(true);
 		setIsLoading(false);
 		createCommaSeparatedWinnerUidString();
-		await new Promise((resolve) => setTimeout(resolve, 7000)); //7000
+		await new Promise((resolve) => setTimeout(resolve, confettiTime)); //7000
+		setDisabled(false);
 		setShowConfetti(false);
 	}
 
@@ -264,7 +271,7 @@ export default function Home() {
 			<div className="h-10 max-w-[1248px] w-full mx-auto p-6">
 				<h1 className="text-xl">Y7 Raffle</h1>
 			</div>
-			<div className="flex flex-row max-w-[1248px] w-full h-[calc(100vh-48px)] mx-auto">
+			<div className="flex flex-row max-w-[1248px] w-full h-[70vh] mx-auto">
 				<div className="z-10 w-[30%] flex flex-col items-center gap-2 font-mono text-sm lg:flex">
 					<div className="p-4 gap-2 overflow-y-scroll h-full w-full flex flex-col">
 						<div className="flex-row rounded-xl flex gap-2">
@@ -298,12 +305,7 @@ export default function Home() {
 								</div>
 							))}
 					</div>
-					<div onSubmit={(e) => e.preventDefault()} className="flex p-2 gap-2 w-full">
-						<Input placeholder="Enter ID to Add" value={addWinnerInput} onChange={(e) => setAddWinnerInput(e.target.value)} className="h-full"></Input>
-						<Button isDisabled={students.filter((s) => s.selected).length == students.length} type="submit" onPress={addWinner} className="h-full">
-							Add →
-						</Button>
-					</div>
+					<div onSubmit={(e) => e.preventDefault()} className="flex p-2 gap-2 w-full"></div>
 				</div>
 				<div className="z-10 w-[70%] flex flex-col gap-4 items-center justify-between font-mono text-sm lg:flex">
 					{!showModal && latestName && !!students.filter((s) => s.selected).length && <Spinner className="p-12 z-[500000] h-full flex flex-col gap-4 w-full" size="lg" />}
@@ -316,12 +318,87 @@ export default function Home() {
 							</p>
 						</div>
 					)}
-					<div className="w-full mt-auto bottom-0 p-2 min-h-[72px] !h-[72px]">
-						<Button onPress={drawNewName} isDisabled={students.filter((s) => s.selected).length == students.length} isLoading={isLoading} className="w-full h-full mt-auto bg-gradient-to-r from-green-300 via-blue-500 to-purple-600">
-							Draw New Name
-						</Button>
-					</div>
+					<div className="w-full mt-auto flex flex-row gap-2 bottom-0 p-2 min-h-[72px] !h-[72px]"></div>
 				</div>
+			</div>
+			<div className="hover:shadow-xl duration-300 grid grid-cols-5 grid-rows-2 z-10 shadow-md bottom-10 bg-gray-200 p-2 m-auto gap-2 w-[1000px] rounded-xl">
+				<Input placeholder="Enter ID to Add" value={addWinnerInput} onChange={(e) => setAddWinnerInput(e.target.value)} className="h-full col-span-2"></Input>
+				<Button isDisabled={students.filter((s) => s.selected).length == students.length} type="submit" onPress={addWinner} className="h-full col-span-1">
+					Add →
+				</Button>
+				<Select selectedKeys={[waitTime.toString()]} value={waitTime} onChange={(e) => setWaitTime(e.target.value)} label="Wait Time" placeholder="Select Time" className="col-span-1">
+					<SelectItem key={"0"} value={0}>
+						None
+					</SelectItem>
+					<SelectItem key={"1000"} value={1000}>
+						1 Second
+					</SelectItem>
+					<SelectItem key={"2000"} value={2000}>
+						2 Second
+					</SelectItem>
+					<SelectItem key={"3000"} value={3000}>
+						3 Second
+					</SelectItem>
+					<SelectItem key={"4000"} value={4000}>
+						4 Second
+					</SelectItem>
+					<SelectItem key={"5000"} value={5000}>
+						5 Second
+					</SelectItem>
+					<SelectItem key={"6000"} value={6000}>
+						6 Second
+					</SelectItem>
+					<SelectItem key={"7000"} value={7000}>
+						7 Second
+					</SelectItem>
+					<SelectItem key={"8000"} value={8000}>
+						8 Second
+					</SelectItem>
+					<SelectItem key={"9000"} value={9000}>
+						9 Second
+					</SelectItem>
+					<SelectItem key={"10000"} value={10000}>
+						10 Second
+					</SelectItem>
+				</Select>
+				<Select selectedKeys={[confettiTime.toString()]} value={confettiTime} onChange={(e) => setConfettiTime(e.target.value)} label="Confetti Time" placeholder="Select Time" className="col-span-1">
+					<SelectItem key={"0"} value={0}>
+						None
+					</SelectItem>
+					<SelectItem key={"1000"} value={1000}>
+						1 Second
+					</SelectItem>
+					<SelectItem key={"2000"} value={2000}>
+						2 Second
+					</SelectItem>
+					<SelectItem key={"3000"} value={3000}>
+						3 Second
+					</SelectItem>
+					<SelectItem key={"4000"} value={4000}>
+						4 Second
+					</SelectItem>
+					<SelectItem key={"5000"} value={5000}>
+						5 Second
+					</SelectItem>
+					<SelectItem key={"6000"} value={6000}>
+						6 Second
+					</SelectItem>
+					<SelectItem key={"7000"} value={7000}>
+						7 Second
+					</SelectItem>
+					<SelectItem key={"8000"} value={8000}>
+						8 Second
+					</SelectItem>
+					<SelectItem key={"9000"} value={9000}>
+						9 Second
+					</SelectItem>
+					<SelectItem key={"10000"} value={10000}>
+						10 Second
+					</SelectItem>
+				</Select>
+				<Button onPress={drawNewName} isDisabled={students.filter((s) => s.selected).length == students.length || disabled} isLoading={isLoading} className="w-full text-white h-full col-span-5 mt-auto bg-gradient-to-r from-green-300 via-blue-500 to-purple-600">
+					{!disabled ? "Draw New Name" : "Please Wait"}
+				</Button>
 			</div>
 		</main>
 	);
