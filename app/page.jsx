@@ -173,8 +173,8 @@ export default function Home() {
 	const [latestName, setLatestName] = useState("");
 	const [showModal, setShowModal] = useState(false);
 	const [disabled, setDisabled] = useState(false);
-	const [waitTime, setWaitTime] = useState(7000);
-	const [confettiTime, setConfettiTime] = useState(3000);
+	const [waitTime, setWaitTime] = useState(3000);
+	const [confettiTime, setConfettiTime] = useState(7000);
 	const [x, setX] = useState(0);
 	const [y, setY] = useState(0);
 
